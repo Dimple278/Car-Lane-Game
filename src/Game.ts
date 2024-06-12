@@ -56,29 +56,32 @@ export class Game {
       this.speed++;
     }, 3000);
   }
+  
+drawBackground() {
+  const gradient = this.ctx.createLinearGradient(4, 4, 4, this.canvas.height);
+  gradient.addColorStop(0, "#37474F"); 
+  gradient.addColorStop(1, "#607D8B"); 
+  this.ctx.fillStyle = gradient;
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+}
 
-  drawBackground() {
-    this.ctx.fillStyle = "Gray";
-    this.ctx.fillRect(0, 0, 400, 700);
-  }
+drawLives() {
+  this.ctx.font = "30px Arial";
+  this.ctx.fillStyle = "#FFF"; 
+  this.ctx.fillText("Lives: " + this.lives, 290, 40); 
+}
 
-  drawLives() {
-    this.ctx.font = "30px Serif";
-    this.ctx.fillStyle = "White";
-    this.ctx.fillText("Lives: " + this.lives, 300, 40);
-  }
+drawScore() {
+  this.ctx.font = "30px Arial";
+  this.ctx.fillStyle = "#FFF"; 
+  this.ctx.fillText("Score: " + this.score, 20, 40); 
+}
 
-  drawScore() {
-    this.ctx.font = "30px Serif";
-    this.ctx.fillStyle = "White";
-    this.ctx.fillText("Score: " + this.score, 20, 40);
-  }
-
-  drawHighScore() {
-    this.ctx.font = "20px Serif";
-    this.ctx.fillStyle = "Yellow";
-    this.ctx.fillText("High Score: " + this.highScore, 20, 70);
-  }
+drawHighScore() {
+  this.ctx.font = "20px Arial";
+  this.ctx.fillStyle = "#FFD700"; 
+  this.ctx.fillText("High Score: " + this.highScore, 20, 70); 
+}
 
   drawLines() {
     this.lines.forEach((line) => {
@@ -111,24 +114,30 @@ export class Game {
 
   stop() {
     if (this.myReq) {
-      cancelAnimationFrame(this.myReq);
+        cancelAnimationFrame(this.myReq);
     }
-    this.ctx.font = "60px Serif";
-    this.ctx.fillStyle = "Red";
-    this.ctx.fillText("Game Over", 80, 350);
-    this.ctx.font = "40px Serif";
-    this.ctx.fillStyle = "Blue";
-    this.ctx.fillText(`Your score was: ${this.score}`, 80, 400);
-    this.ctx.fillStyle = "Green";
-    this.ctx.fillText(`High Score: ${this.highScore}`, 80, 450);
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); 
+    this.ctx.font = "60px Arial";
+    this.ctx.fillStyle = "#FF5733"; 
+    this.ctx.fillText("Game Over", 50, 250);
+
+    this.ctx.font = "40px Arial";
+    this.ctx.fillStyle = "#3498DB";
+    this.ctx.fillText(`Your score: ${this.score}`, 100, 350);
+
+    this.ctx.font = "30px Arial";
+    this.ctx.fillStyle = "#27AE60"; 
+    this.ctx.fillText(`High Score: ${this.highScore}`, 100, 400);
+
     this.showRestartButton();
     this.stopGame = true;
 
     if (this.score > this.highScore) {
-      this.highScore = this.score;
-      this.saveHighScore(this.highScore);
+        this.highScore = this.score;
+        this.saveHighScore(this.highScore);
     }
-  }
+}
 
   render() {
     if (this.stopGame) return;
