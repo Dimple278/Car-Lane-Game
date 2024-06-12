@@ -5,6 +5,8 @@ export class Game {
   ctx: CanvasRenderingContext2D;
   lives: number;
   speed: number;
+  score: number;
+  highScore: number;
   stopGame: boolean;
   myReq: number | null;
   left: boolean;
@@ -12,13 +14,14 @@ export class Game {
   lines: Line[];
   myCar: Car;
   enemyCars: EnemyCar[];
-  collisionCooldown: boolean;
 
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.lives = 5;
     this.speed = 4;
+    this.score = 0;
+    this.highScore = this.getHighScore();
     this.stopGame = false;
     this.myReq = null;
     this.left = false;
@@ -34,7 +37,6 @@ export class Game {
       new EnemyCar("./car-2.png", 50, -150),
       new EnemyCar("./car-3.png", 250, -450),
     ];
-    this.collisionCooldown = false;
 
     this.initEventListeners();
   }
@@ -66,6 +68,18 @@ export class Game {
     this.ctx.fillText("Lives: " + this.lives, 300, 40);
   }
 
+  drawScore() {
+    this.ctx.font = "30px Serif";
+    this.ctx.fillStyle = "White";
+    this.ctx.fillText("Score: " + this.score, 20, 40);
+  }
+
+  drawHighScore() {
+    this.ctx.font = "20px Serif";
+    this.ctx.fillStyle = "Yellow";
+    this.ctx.fillText("High Score: " + this.highScore, 20, 70);
+  }
+
   drawLines() {
     this.lines.forEach((line) => {
       line.draw(this.ctx);
@@ -82,20 +96,17 @@ export class Game {
   drawEnemyCars() {
     this.enemyCars.forEach((enemyCar) => {
       enemyCar.draw(this.ctx);
-      enemyCar.update(this.speed, this.myCar, this.loseLife.bind(this));
+      enemyCar.update(this.speed, this.myCar, this.loseLife.bind(this), this.incrementScore.bind(this));
     });
   }
 
   loseLife() {
-    if (!this.collisionCooldown) {
-      this.lives--;
-      this.collisionCooldown = true;
-      setTimeout(() => {
-        this.collisionCooldown = false;
-      }, 1000); // Cooldown period of 1 second
+    this.lives--;
+    if (this.lives < 1) this.stop();
+  }
 
-      if (this.lives < 1) this.stop();
-    }
+  incrementScore() {
+    this.score++;
   }
 
   stop() {
@@ -107,8 +118,16 @@ export class Game {
     this.ctx.fillText("Game Over", 80, 350);
     this.ctx.font = "40px Serif";
     this.ctx.fillStyle = "Blue";
-    this.ctx.fillText(`Your score was: ${this.speed}`, 80, 400);
+    this.ctx.fillText(`Your score was: ${this.score}`, 80, 400);
+    this.ctx.fillStyle = "Green";
+    this.ctx.fillText(`High Score: ${this.highScore}`, 80, 450);
+    this.showRestartButton();
     this.stopGame = true;
+
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      this.saveHighScore(this.highScore);
+    }
   }
 
   render() {
@@ -116,6 +135,8 @@ export class Game {
 
     this.drawBackground();
     this.drawLives();
+    this.drawScore();
+    this.drawHighScore();
     this.drawLines();
     this.drawMyCar();
     this.drawEnemyCars();
@@ -130,7 +151,31 @@ export class Game {
     this.stopGame = false;
     this.lives = 5;
     this.speed = 4;
+    this.score = 0;
     this.enemyCars.forEach(enemyCar => enemyCar.resetPosition());
     this.start();
+  }
+
+  showRestartButton() {
+    const restartButton = document.getElementById('restartButton');
+    if (restartButton) {
+      restartButton.style.display = 'block';
+    }
+  }
+
+  hideRestartButton() {
+    const restartButton = document.getElementById('restartButton');
+    if (restartButton) {
+      restartButton.style.display = 'none';
+    }
+  }
+
+  getHighScore(): number {
+    const highScore = localStorage.getItem('highScore');
+    return highScore ? parseInt(highScore) : 0;
+  }
+
+  saveHighScore(score: number) {
+    localStorage.setItem('highScore', score.toString());
   }
 }

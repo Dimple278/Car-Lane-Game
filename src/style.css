@@ -30,3 +30,20 @@ body{
   border-radius: 5px;
   cursor: pointer;
 }
+
+
+
+#restartButton{
+  position: absolute;
+  top: 70%;
+  left: 45%;
+  display: none;
+  padding: 20px;
+  font-size: 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
