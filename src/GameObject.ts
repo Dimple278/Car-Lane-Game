@@ -50,6 +50,7 @@ export class Car {
 export class EnemyCar extends Car {
   initialX: number;
   initialY: number;
+  static positions: number[] = [50, 183, 316]; // Possible positions on the x-axis for cars.
 
   constructor(src: string, x: number, y: number) {
     super(src, x, y);
@@ -57,21 +58,28 @@ export class EnemyCar extends Car {
     this.initialY = y;
   }
 
-  update(speed: number, myCar: Car, loseLife: () => void, incrementScore: () => void) {
+  update(speed: number, myCar: Car, loseLife: () => void, incrementScore: () => void, enemyCars: EnemyCar[]) {
     this.y += speed;
     if (this.y > 700) {
-      this.resetPosition();
+      this.resetPosition(enemyCars);
       incrementScore();
     }
     if (this.detectCollision(myCar)) {
       loseLife();
-      this.resetPosition();
+      this.resetPosition(enemyCars);
     }
   }
 
-  resetPosition() {
+  resetPosition(enemyCars: EnemyCar[]) {
     this.y = this.initialY;
-    this.x = Math.floor(Math.random() * 3) * 133 + 50;
+    let newPosition: number;
+
+    // Ensure the new position does not overlap with other enemy cars.
+    do {
+      newPosition = Math.floor(Math.random() * 3) * 133 + 50;
+    } while (enemyCars.some(car => car !== this && car.x === newPosition && Math.abs(car.y - this.y) < 140));
+
+    this.x = newPosition;
   }
 
   detectCollision(myCar: Car): boolean {
@@ -82,3 +90,5 @@ export class EnemyCar extends Car {
     );
   }
 }
+
+
